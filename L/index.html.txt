@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hello Kitty Anniversary Game 💖</title>
+  <style>
+    body {
+      margin: 0;
+      background: pink;
+      overflow: hidden;
+      font-family: 'Comic Sans MS', cursive;
+      text-align: center;
+    }
+
+    h1 {
+      color: white;
+      text-shadow: 2px 2px #ff69b4;
+      margin-top: 10px;
+    }
+
+    #gameCanvas {
+      display: block;
+      margin: 0 auto;
+      background: white;
+      border: 5px solid #ff69b4;
+      border-radius: 10px;
+    }
+
+    #score {
+      color: #ff1493;
+      font-size: 24px;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>💖 Happy Anniversary 💖</h1>
+  <div id="score">Score: 0</div>
+  <canvas id="gameCanvas" width="400" height="600"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let kitty = new Image();
+    kitty.src = "https://i.imgur.com/v0JvYjB.png"; // Hello Kitty PNG
+
+    let heart = new Image();
+    heart.src = "https://i.imgur.com/EV6pPdi.png"; // Heart PNG
+
+    let kittyX = 160;
+    let kittyY = 520;
+    let score = 0;
+
+    let hearts = [];
+
+    document.addEventListener("keydown", moveKitty);
+
+    function moveKitty(e) {
+      if (e.key === "ArrowLeft" && kittyX > 0) {
+        kittyX -= 30;
+      } else if (e.key === "ArrowRight" && kittyX < canvas.width - 80) {
+        kittyX += 30;
+      }
+    }
+
+    function drawKitty() {
+      ctx.drawImage(kitty, kittyX, kittyY, 80, 80);
+    }
+
+    function drawHearts() {
+      for (let i = 0; i < hearts.length; i++) {
+        ctx.drawImage(heart, hearts[i].x, hearts[i].y, 40, 40);
+        hearts[i].y += 3;
+
+        // check if kitty catches a heart
+        if (
+          hearts[i].y > kittyY &&
+          hearts[i].x > kittyX - 20 &&
+          hearts[i].x < kittyX + 60
+        ) {
+          score++;
+          hearts.splice(i, 1);
+          i--;
+        }
+
+        // missed heart
+        if (hearts[i] && hearts[i].y > canvas.height) {
+          hearts.splice(i, 1);
+          i--;
+        }
+      }
+    }
+
+    function drawScore() {
+      document.getElementById("score").innerText = "Score: " + score;
+    }
+
+    function spawnHeart() {
+      let x = Math.random() * (canvas.width - 40);
+      hearts.push({ x: x, y: -40 });
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawKitty();
+      drawHearts();
+      drawScore();
+      requestAnimationFrame(gameLoop);
+    }
+
+    setInterval(spawnHeart, 1000);
+    gameLoop();
+  </script>
+</body>
+</html>
